@@ -47,11 +47,11 @@ app.post('/bot', (req, res) => {
         if (body.EventName === "*online") {
             
             body.Message = process.env.BOT_WAKE_UP_WORD || "/get_started";
-            logger.child({ body }).debug("*online")
+            logger.child({ body }).debug(" 🗣  Client: *online")
             send(res, body)
         } else {
             // *text
-            logger.child({ body }).debug("*text")
+            logger.child({ body }).debug(` 🗣 Client: *text ${body.Message}`)
             send(res, body)
         }
 
@@ -82,8 +82,6 @@ app.listen(port, () =>
   logger
     .child({
       module: `apiRest`,
-      url: '/bot',
-      port: process.env.API_PORT
     })
-    .info("Api Rest started ")
+    .info("Endpoint /bot is listening on port " + port)
 );

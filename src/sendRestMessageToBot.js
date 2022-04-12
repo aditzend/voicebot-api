@@ -1,5 +1,5 @@
 /*
- * Botfarm Gateway
+ * Voicebot API
  * sendRestMessageToBot.js
  */
 
@@ -36,7 +36,7 @@ const gwiTransfer = (body, msgForClient) => {
 
 const showMessageThenTransfer = (body, msgForClient) => {
   // envio un mensaje con *text
-  logger.debug("showMessage before Transfer ");
+  logger.debug(" 🚀 showMessage before Transfer ");
   body.Events.push({ name: "*text", message: msgForClient });
 
   logger.debug("SESSION TRANSFERED");
@@ -44,7 +44,7 @@ const showMessageThenTransfer = (body, msgForClient) => {
 };
 
 const sendResponse = (res, body) => {
-  logger.child({...body}).debug(`⬅️ Outbound Message sent via REST API`);
+  logger.child({...body}).debug(` ⬅️  ${body.Events.length} Events sent to client`);
   res.json(body);
 };
 
@@ -60,13 +60,13 @@ const requestBot = (res, uri, body) => {
     },
     json: true,
   };
-  logger.child({...options}).debug(`🔀 Requested BotName: ${body.BotName} Dispatched to:${uri}`);
+  logger.child({...options}).debug(` 🚏  Routed to ${uri}, requested bot was ${body.BotName}`);
   // enviamos el mensaje al bot server que se pidio
 
   rp(options)
     .then((b) => {
       b.map(function (i) {
-        logger.child({ ...i }).debug(`➡️ Inbound : Bot Says ${i.text}`);
+        logger.child({ ...i }).debug(` 🤖 Bot: ${i.text}`);
         body.Message = i.text;
         gatewayInstruction = i.text.split(">>>")[0];
         msgForClient = i.text.split(">>>")[1];

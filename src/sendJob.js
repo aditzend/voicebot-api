@@ -1,5 +1,5 @@
 /*
- * Botfarm Gateway
+ * Voicebot API
  * sendJob.js
  */
 

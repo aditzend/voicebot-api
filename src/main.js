@@ -1,9 +1,9 @@
 /*
- * Botfarm Gateway
+ * Voicebot API
  * main.js
  */
 
-VERSION = `2.4.0`
+VERSION = `1.0.1`
 
 const {logger} = require("./logger")
 
@@ -14,10 +14,6 @@ logger
     module: `main`,
     VERSION,
   })
-  .info(`Botfarm Gateway started`);
-
-require("./webSocket")
-
+  .info(`Voicebot API started`);
 
 require("./apiRest");
-// la apirest es para pruebas, como le hace un bypass a concordia no se crean tareas de etl.

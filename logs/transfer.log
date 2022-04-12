@@ -1043,7 +1043,7 @@ November 3, 2021 1:50 AM probado ok aca
 transfer anda bien, pero offline no cierra la sesion
 
 ```bash
-2021-11-03T05:00:26.299473133Z info: Botfarm Gateway started {"module":"main","version":"2.1.0"},
+2021-11-03T05:00:26.299473133Z info: Voicebot API started {"module":"main","version":"2.1.0"},
 2021-11-03T05:00:26.722985564Z info: WebSocket started {"depends_on":"CONCORDIA ^1.15.0","module":"webSocket","web_socket_port":"8646"},
 2021-11-03T05:00:26.868181122Z info: Api Rest started  {"module":"apiRest","url":"/bot"},
 2021-11-03T13:47:53.361892486Z debug: A new message hit the socket  {"BotName":"Alojamiento_Worker","Channel":"web_sock","Encoding":"utf-8","EventName":"*online","InteractionId":"211103104753315_CHT_56000","Lang":"es","Message":"","MimeType":"text/plain","Parameters":["user.name=Lilita","user.mail=Lilita@myserver.com","user.channel=21"],"Source":"186.22.18.95","UserChannel":"21","UserId":"Lilita","UserMail":"Lilita@myserver.com","UserName":"Lilita"},

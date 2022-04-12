@@ -1,5 +1,5 @@
 /*
- * Botfarm Gateway
+ * Voicebot API
  * helpers.js
  */
 
@@ -139,7 +139,7 @@ const getParamsFromBotAndFinish = (event_name, socket, body) => {
           module: `helpers getParamsFromBotAndFinish`,
           ...body,
         })
-        .debug(`⬅️ Outbound Message sent via Socket`);
+        .debug(` ⬅️  Outbound Message sent via Socket`);
       socket.send(JSON.stringify(body));
 
 
