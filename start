@@ -1,0 +1,12 @@
+#!/bin/bash
+LOG_LEVEL="debug" \
+NODE_ENV="development" \
+BOT_ENV="development" \
+BOT_DEV_URL="http://192.168.43.169:18005" \
+BLUEBIRD_W_FORGOTTEN_RETURN=0 \
+RABBITMQ_HOST="amqp://192.168.43.169:35672" \
+BOT_WAKE_UP_WORD="/start" \
+API_PORT=8656 \
+WEB_SOCKET_PORT=8646 \
+PRODUCTION_RASA_SERVICE_NAME="rasa" \
+node --trace-warnings src/main 

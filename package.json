@@ -1,0 +1,26 @@
+{
+  "name": "botfarm_gateway",
+  "version": "0.2.2",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "origin": "https://alexander.ditzend@bitbucket.mitrol.net/scm/btf/gateway.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.8.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "moment": "^2.24.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "winston": "^3.3.3",
+    "ws": "^7.1.2"
+  }
+}
