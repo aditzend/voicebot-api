@@ -7,5 +7,5 @@ Este servicio es el encargado de comunicarse con ChatServer y despachar el mensa
 
 
 ## Changelog 1.0.1
-- Se borraron todos los modulos de websocket, se mando eso a concordia-ws.
+- Se borraron todos los modulos de websocket, se mando eso a concordia-ws para separar los criterios de ruteo.
 
