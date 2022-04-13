@@ -42,26 +42,45 @@ if (process.env.NODE_ENV !== "production") {
 
   addColors(colors);
 } else {
-  logger = createLogger({
-    level: process.env.LOG_LEVEL,
-    levels: logLevels,
-    colors: colors,
-    transports: [
-      //
-      // - Write all logs with level `error` and below to `error.log`
-      // - Write all logs with level `info` and below to `combined.log`
-      //
-      // new winston.transports.File({ filename: "error.log", level: "error" }),
-      // new winston.transports.File({ filename: "combined.log" }),
-      new transports.Console(),
-    ],
+// TODO ver como transportar estos logs porque son los mismos que desarrollo
+logger = createLogger({
+  levels: logLevels,
+  transports: [
+    new transports.Console({
+      level: process.env.LOG_LEVEL,
 
-    format: format.combine(format.timestamp(), format.json()),
+      format: format.combine(
+        format.colorize(),
+        format.prettyPrint(),
+        format.simple()
+      ),
+    }),
+  ],
+});
 
-    defaultMeta: {
-      service: `${process.env.BOT_NAME}_gateway`,
-    },
-  });
+
+
+
+  // logger = createLogger({
+  //   level: process.env.LOG_LEVEL,
+  //   levels: logLevels,
+  //   colors: colors,
+  //   transports: [
+  //     //
+  //     // - Write all logs with level `error` and below to `error.log`
+  //     // - Write all logs with level `info` and below to `combined.log`
+  //     //
+  //     // new winston.transports.File({ filename: "error.log", level: "error" }),
+  //     // new winston.transports.File({ filename: "combined.log" }),
+  //     new transports.Console(),
+  //   ],
+
+  //   format: format.combine(format.timestamp(), format.json()),
+
+  //   defaultMeta: {
+  //     service: `${process.env.BOT_NAME}_gateway`,
+  //   },
+  // });
 }
 
 module.exports = {
