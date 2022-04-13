@@ -21,5 +21,5 @@ COPY --chown=node:node ./src .
 # copy production node_modules
 # copy app sources
 # expose port and define CMD
-EXPOSE 8646
+EXPOSE 8656
 CMD ["node", "main.js"]
