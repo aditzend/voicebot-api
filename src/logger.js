@@ -11,6 +11,15 @@ const logLevels = {
 
 var logger = {};
 
+const colors = {
+  fatal: "red",
+  error: "magenta",
+  warn: "yellow",
+  info: "green",
+  debug: "cyan",
+  trace: "blue",
+};
+
 if (process.env.NODE_ENV !== "production") {
   // logs copados para desarrollar y hacer debug local
   logger = createLogger({
@@ -29,14 +38,7 @@ if (process.env.NODE_ENV !== "production") {
     ],
   });
 
-  const colors = {
-    fatal: "red",
-    error: "magenta",
-    warn: "yellow",
-    info: "green",
-    debug: "cyan",
-    trace: "blue",
-  };
+  
 
   addColors(colors);
 } else {
