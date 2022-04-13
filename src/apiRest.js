@@ -25,16 +25,16 @@ app.post('/bot', (req, res) => {
       ""
     );
 
-    // sacamos los caracteres raros que esta tirando concordia 15
-    if (body.Message.includes("cmd=&msg=")) body.Message = body.Message.replace("cmd=&msg=", "");
-    if (body.Message.includes("&")) body.Message = body.Message.replace("&", "");
-    if (body.Message.includes("&")) body.Message = body.Message.replace("&", "");
+    // TODO Revisar esto, no seria necesario para el voicebot. 
+    // if (body.Message.includes("cmd=&msg=")) body.Message = body.Message.replace("cmd=&msg=", "");
+    // if (body.Message.includes("&")) body.Message = body.Message.replace("&", "");
+    // if (body.Message.includes("&")) body.Message = body.Message.replace("&", "");
 
-    // primero veo si me esta pegando un concordia 1.15.0
+    // primero veo si tengo un id de interaccion
     if (body.InteractionId && body.Message !== "error:1003") {
 
         const connectionID = body.InteractionId;
-        // se supone que todos los bots corren en atenea
+        // se supone que todos los bots corren en servidores propios
         logger.debug({
             origin: "USER",
             connection_id: connectionID,
@@ -47,11 +47,11 @@ app.post('/bot', (req, res) => {
         if (body.EventName === "*online") {
             
             body.Message = process.env.BOT_WAKE_UP_WORD || "/get_started";
-            logger.child({ body }).debug(" 🗣  Client: *online")
+            logger.child({ body }).debug(`${body.InteractionId} 🔌  Client: *online`)
             send(res, body)
         } else {
             // *text
-            logger.child({ body }).debug(` 🗣 Client: *text ${body.Message}`)
+            logger.child({ body }).debug(`${body.InteractionId} 🗣 Client: *text '${body.Message}'`)
             send(res, body)
         }
 

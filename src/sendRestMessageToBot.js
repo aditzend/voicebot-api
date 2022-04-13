@@ -25,26 +25,32 @@ const noBotName = (res, body) => {
 };
 const directTransfer = (body) => {
   // Transferimos sin pasar este mensaje al bot
-  logger.debug("SESSION TRANSFERED");
+  logger.debug(`${body.InteractionId} 👋 transfered`);
+
+
   body.Events.push = { name: "*transfer", message: "" };
 };
 
 const gwiTransfer = (body, msgForClient) => {
-  logger.debug("SESSION TRANSFERED");
+  logger.debug(`${body.InteractionId} 👋 transfered`);
+
+
   body.Events.push({ name: "*transfer", message: msgForClient });
 };
 
 const showMessageThenTransfer = (body, msgForClient) => {
   // envio un mensaje con *text
-  logger.debug(" 🚀 showMessage before Transfer ");
+  logger.debug(`${body.InteractionId} 👋 transfered`);
+
   body.Events.push({ name: "*text", message: msgForClient });
 
-  logger.debug("SESSION TRANSFERED");
+  logger.debug(`${body.InteractionId} 👋 transfered`);
   body.Events.push({ name: "*transfer", message: "" });
 };
 
 const sendResponse = (res, body) => {
-  logger.child({...body}).debug(` ⬅️  ${body.Events.length} Events sent to client`);
+  logger.child({...body}).debug(`${body.InteractionId} ⬅️  ${body.Events.length} ${body.Events.length === 1? "Event":"Events"} sent to client`);
+
   res.json(body);
 };
 
@@ -60,22 +66,28 @@ const requestBot = (res, uri, body) => {
     },
     json: true,
   };
-  logger.child({...options}).debug(` 🚏  Routed to ${uri}, requested bot was ${body.BotName}`);
+  logger.child({...options}).debug(`${body.InteractionId} 🚏 Routed to ${uri}, requested bot was ${body.BotName}`);
   // enviamos el mensaje al bot server que se pidio
 
   rp(options)
     .then((b) => {
       b.map(function (i) {
-        logger.child({ ...i }).debug(` 🤖 Bot: ${i.text}`);
+        logger.child({ ...i }).debug(`${body.InteractionId} 🤖 Bot: ${i.text}`);
         body.Message = i.text;
-        gatewayInstruction = i.text.split(">>>")[0];
+        command = i.text.split(">>>")[0];
         msgForClient = i.text.split(">>>")[1];
 
-        gatewayInstruction.includes("transfer")
-          ? gwiTransfer(body, msgForClient)
-          : gatewayInstruction.includes("showMessageThenTransfer")
-          ? showMessageThenTransfer(body, msgForClient)
-          : body.Events.push({ name: "*text", message: i.text });
+        if (
+          command.includes("showMessageThenTransfer") ||
+          command.includes("ShowMessageThenTransfer") ||
+          command.includes("mostrarMensajeLuegoTransferir") || 
+          command.includes("MostrarMensajeLuegoTransferir")       ) {
+          showMessageThenTransfer(body, msgForClient);
+        } else {
+          body.Parameters = [];
+          body.Events.push({ name: "*text", message: i.text })
+        }
+          
       });
 
       sendResponse(res, body);
