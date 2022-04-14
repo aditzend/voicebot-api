@@ -74,7 +74,7 @@ app.post('/bot', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-    res.send(`Gateway API REST Version ${VERSION}`)
+    res.send(`Voicebot API REST ${VERSION}`)
 
 })
 
