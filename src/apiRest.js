@@ -26,7 +26,7 @@ app.post('/bot', (req, res) => {
     );
 
     // sacamos el $
-    body.Message = body.Message.replace(/\$/g, "");
+    body.Message = body.Message.replace(/\$/g, " pesos ");
 
 
 
