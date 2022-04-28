@@ -55,7 +55,8 @@ const sendResponse = (res, body) => {
 };
 
 const requestBot = (res, uri, body) => {
-  let msgForBot = body && body.Message && body.Message.toLowerCase();
+  let msgForBot = body && body.Message;
+
   // atencion! la uri incluye http o https, no anteponerlo en este codigo
   const options = {
     method: "POST",

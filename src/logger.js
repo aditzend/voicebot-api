@@ -57,6 +57,8 @@ logger = createLogger({
     }),
   ],
 });
+addColors(colors);
+
 
 
 

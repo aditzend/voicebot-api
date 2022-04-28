@@ -25,6 +25,12 @@ app.post('/bot', (req, res) => {
       ""
     );
 
+    // sacamos el $
+    body.Message = body.Message.replace(/\$/g, "");
+
+
+
+
     // TODO Revisar esto, no seria necesario para el voicebot. 
     // if (body.Message.includes("cmd=&msg=")) body.Message = body.Message.replace("cmd=&msg=", "");
     // if (body.Message.includes("&")) body.Message = body.Message.replace("&", "");
@@ -44,30 +50,101 @@ app.post('/bot', (req, res) => {
             message: body.Message,
         });
 
-        if (body.EventName === "*online") {
-            
-            body.Message = process.env.BOT_WAKE_UP_WORD || "/get_started";
+        switch (body.EventName) {
+            case "*online": {
+              body.Message = process.env.BOT_WAKE_UP_WORD || "/get_started";
             logger.child({ body }).debug(`${body.InteractionId} 🔌  Client: *online`)
             send(res, body)
-        } else {
-            // *text
-            logger.child({ body }).debug(`${body.InteractionId} 🗣 Client: *text '${body.Message}'`)
-            send(res, body)
-        }
+            break;
+            }
+            case "*offline": {
+                logger.child({ body }).debug(`${body.InteractionId} 🔌  Client: *offline`)
+                // body.EventName = "*offline";
+                // body.Message = `${body.InteractionId} is now offline`;
+                // send(res, body)
+                break;
+            }
+            case "*text": {
+              if (body.Message.length > 0) {
+                logger.child({ body }).debug(`${body.InteractionId} 🗣 Client: *text '${body.Message}'`)
+                let msgForBot = body.Message.toLowerCase();
 
+
+                if (process.env.NUMBER_CONDENSING_ENABLED === "true") {
+                  let asrBugRegex = /\d\s\d/;
+                  let numberOrSpaceRegex = /\d|\s/;
+                  let spaceRegex = /\s/;
+                  let notNumberRegex = /\D/;
+                  let match = asrBugRegex.exec(msgForBot)
+                  if (match) {
+                    logger.trace("match found at " + match.index + " char:" + msgForBot[match.index])
+                    let firstCursor = match.index;
+                    while (numberOrSpaceRegex.exec(msgForBot[firstCursor])) {
+                      firstCursor--;
+                    } 
+                    logger.trace(`First cursor stopped at ${firstCursor}, char : ${msgForBot[firstCursor]}`)
+                    let secondCursor = firstCursor + 1;
+                    while (spaceRegex.exec(msgForBot[secondCursor])) {
+                      secondCursor++;
+                    }
+                    logger.trace(`Second cursor stopped at ${secondCursor}, char : ${msgForBot[secondCursor]}`)
+
+                    let thirdCursor = secondCursor
+
+                    while (numberOrSpaceRegex.exec(msgForBot[thirdCursor])) {
+                      thirdCursor++;
+                    }
+                    logger.trace(`Third cursor stopped at ${thirdCursor}, char : ${msgForBot[thirdCursor]}`)
+
+                    let fourthCursor = msgForBot[thirdCursor] === undefined ? thirdCursor - 1 : thirdCursor;
+                    while (notNumberRegex.exec(msgForBot[fourthCursor])) {
+                      fourthCursor--;
+                    }
+                    logger.trace(`Fourth cursor stopped at ${fourthCursor}, char : ${msgForBot[fourthCursor]}`)
+
+                    let toBeCondensed = msgForBot.substring(secondCursor, fourthCursor + 1);
+                    let condensed = toBeCondensed.replace(/\s/g, '');
+                    logger.trace(`Condensed ${toBeCondensed} to ${condensed}`)
+
+                    let beforeString = msgForBot.substring(0, secondCursor);
+                    let afterString = msgForBot.substring(fourthCursor + 1);
+
+                    msgForBot = beforeString + condensed + afterString;
+
+                    logger.trace(`Final message: ${msgForBot}`)
+                  }
+
+
+                  
+                }
+                
+                body.Message = msgForBot
+                send(res, body)
+                break;
+              } else {
+                logger.child({ body }).error(`2000 : ${body.InteractionId} 🗣 Client: *text empty`)
+
+                body.Message = "/2000";
+                send(res, body)
+              }
+            }
+          }
+       
     // error 1003, vino sin InteractionId el mensaje
     } else {
 
         if (body.EventName === "*offline") {
-            logger.debug({message: "OFFLINE"});
+          logger.child({ body }).debug(`${body.InteractionId} 🗣 Client: *offline '${body.Message}'`)
         } else {
             let msg = body;
             msg.error_number = "1003";
             logger
               .child({
                 module: `apiRest app.post`,
+                body,
+                req
               })
-              .error(msg, `NO InteractionId PARAM RECEIVED, CHECK CONCORDIA`);
+              .error(`NO InteractionId PARAM RECEIVED`);
         }
     // res.json({id:1, msg: `tu mensaje fue ${msg}`})
     }
@@ -75,6 +152,7 @@ app.post('/bot', (req, res) => {
 
 app.get('/', (req, res) => {
     res.send(`Voicebot API REST ${VERSION}`)
+
 
 })
 
