@@ -3,7 +3,7 @@
  * sendRestMessageToBot.js
  */
 
-const rp = require("request-promise");
+const requestPromise = require("request-promise");
 const helpers = require("./helpers")
 const {logger} = require("./logger");
 
@@ -58,7 +58,7 @@ const requestBot = (res, uri, body) => {
   let msgForBot = body && body.Message;
 
   // atencion! la uri incluye http o https, no anteponerlo en este codigo
-  const options = {
+  const messageOptions = {
     method: "POST",
     uri: `${uri}/webhooks/rest/webhook`,
     body: {
@@ -67,16 +67,19 @@ const requestBot = (res, uri, body) => {
     },
     json: true,
   };
-  logger.child({...options}).debug(`${body.InteractionId} 🚏 Routed to ${uri}, requested bot was ${body.BotName}`);
+  logger.child({...messageOptions}).debug(`${body.InteractionId} 🚏 Routed to ${uri}, requested bot was ${body.BotName}`);
   // enviamos el mensaje al bot server que se pidio
 
-  rp(options)
-    .then((b) => {
-      b.map(function (i) {
-        logger.child({ ...i }).debug(`${body.InteractionId} 🤖 Bot: ${i.text}`);
-        body.Message = i.text;
-        command = i.text.split(">>>")[0];
-        msgForClient = i.text.split(">>>")[1];
+  requestPromise(messageOptions)
+    .then((botResponse) => {
+      botResponse.map(function (response) {
+        logger.child({ ...response }).debug(`${body.InteractionId} 🤖 Bot: ${response.text}`);
+        body.Message = response.text;
+        command = response.text.split(">>>")[0];
+        msgForClient = response.text.split(">>>")[1];
+
+        
+
 
         if (
           command.includes("showMessageThenTransfer") ||
@@ -84,9 +87,19 @@ const requestBot = (res, uri, body) => {
           command.includes("mostrarMensajeLuegoTransferir") || 
           command.includes("MostrarMensajeLuegoTransferir")       ) {
           showMessageThenTransfer(body, msgForClient);
+        } else if (
+          command.includes("disambiguation") ||
+          command.includes("Disambiguation") ||
+          command.includes("desambiguacion") ||
+          command.includes("Desambiguacion")
+        ) {
+          const disambiguationMessage = ` ${msgForClient} ${response.quick_replies.map(button => button.title)} `
+          logger.trace(`DISAMBIGUATION ${response.text} ${response.quick_replies.map(button => button.title)} `)
+          body.Events.push({ name: "*text", message: disambiguationMessage })
         } else {
+
           body.Parameters = [];
-          body.Events.push({ name: "*text", message: i.text })
+          body.Events.push({ name: "*text", message: response.text })
         }
           
       });

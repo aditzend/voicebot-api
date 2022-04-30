@@ -28,7 +28,8 @@ app.post('/bot', (req, res) => {
     // sacamos el $
     body.Message = body.Message.replace(/\$/g, " pesos ");
 
-
+    // separamos los centavos
+    body.Message = body.Message.replace(/centavo/g, " centavo");
 
 
     // TODO Revisar esto, no seria necesario para el voicebot. 
