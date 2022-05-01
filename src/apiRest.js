@@ -35,6 +35,9 @@ app.post('/bot', (req, res) => {
     // separamos los centavos
     body.Message = body.Message.replace(/centavo/g, " centavo");
 
+    // reemplazamos sentado por centavo
+    body.Message = body.Message.replace(/sentado/g, "centavo");
+
     // cambiamos sentados por centavos, es un error comun del ASR cuando hay ruido de fondo
     body.Message = body.Message.replace(/\ssentado/g, " centavo");
 
