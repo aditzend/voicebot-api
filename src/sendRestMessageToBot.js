@@ -57,7 +57,7 @@ const sendResponse = (res, body) => {
 const requestBot = (res, uri, body) => {
   let msgForBot = body && body.Message;
 
-  // atencion! la uri incluye http o https, no anteponerlo en este codigo
+  // atencion! La uri incluye http o https, no anteponerlo en este código
   const messageOptions = {
     method: "POST",
     uri: `${uri}/webhooks/rest/webhook`,
