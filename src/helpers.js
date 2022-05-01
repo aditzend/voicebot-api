@@ -42,6 +42,9 @@ const noInteractionId = () => {
 };
 
 const sendParam = async (param, uri) => {
+
+  // un ejemplo de param es "user_name=juan"
+
   param = param || "";
 
   const name = param.split("=")[0];
@@ -74,6 +77,19 @@ const sendParam = async (param, uri) => {
       .error(error);
   }
 };
+
+const addVoiceBotApiReplacement = async (body) => {
+  body.BotName = body.BotName || "localhost";
+  body.InteractionId = body.InteractionId || "test";
+  body.Parameters = body.Parameters || [];
+
+  const uri = `${botNameToBotUri(body.BotName)}/conversations/${
+    body.InteractionId
+  }/tracker/events?include_events=NONE`;
+
+  // usar sendParams pero es confuso porque esto no es un param, es un replacement que tiene que llenar el slot voicebot_api_replacements que tiene formato lista
+
+}
 
 const sendParamsToBot = async (body) => {
   body.BotName = body.BotName || "localhost";
@@ -179,4 +195,5 @@ module.exports = {
   getUri,
   sendParamsToBot,
   getParamsFromBotAndFinish,
+  addVoiceBotApiReplacement
 };

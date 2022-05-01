@@ -28,8 +28,22 @@ app.post('/bot', (req, res) => {
     // sacamos el $
     body.Message = body.Message.replace(/\$/g, " pesos ");
 
+
     // separamos los centavos
     body.Message = body.Message.replace(/centavo/g, " centavo");
+
+    // cambiamos sentados por centavos, es un error comun del ASR cuando hay ruido de fondo
+    body.Message = body.Message.replace(/\ssentado/g, " centavo");
+
+    // si hay un con, borramos los centavos
+    const conRegex = /\d\scon\s\d/g;
+    const centavoRegex = /\d\scentavos?/g;
+    if (body.Message.match(conRegex)) {
+      // borramos centavo o centavos
+      body.Message = body.Message.replace(centavoRegex, "");
+      // reemplazamos el con por coma
+      body.Message = body.Message.replace(/\scon\s/g, ",");
+    }
 
 
     // TODO Revisar esto, no seria necesario para el voicebot. 
