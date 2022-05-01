@@ -19,6 +19,9 @@ app.post('/bot', (req, res) => {
 
     if (body.Message === undefined || body.Message === null) body.Message = "";
 
+    // logear el mensaje que crudo como llega
+    logger.child({...body}).debug(`${body.InteractionId} 📥 BEFORE FILTERS: "${body.Message}"`);
+
     // sacamos las tildes
     body.Message = body.Message.normalize("NFD").replace(
       /[\u0300-\u036f]/g,
@@ -42,8 +45,11 @@ app.post('/bot', (req, res) => {
       // borramos centavo o centavos
       body.Message = body.Message.replace(centavoRegex, "");
       // reemplazamos el con por coma
-      body.Message = body.Message.replace(/\scon\s/g, ",");
+      body.Message = body.Message.replace(/\scon\s/g, ".");
     }
+
+    //logear el mensaje despues de los filtros
+    logger.child({...body}).debug(`${body.InteractionId}   🦿 AFTER FILTERS: "${body.Message}"`);
 
 
     // TODO Revisar esto, no seria necesario para el voicebot. 
