@@ -40,12 +40,14 @@ app.post('/bot', (req, res) => {
 
     // si hay un con, borramos los centavos
     const conRegex = /\d\scon\s\d/g;
+    const conReplacementRegex = /\scon\s/g
     const centavoRegex = /(\d\scentavos?)||(\d\ssentados?)/g;
+    const centavoReplacementRegex = /(centavos?)||(sentados?)/g;
     if (body.Message.match(conRegex)) {
       // borramos centavo o centavos
-      body.Message = body.Message.replace(centavoRegex, "");
+      body.Message = body.Message.replace(centavoReplacementRegex, "");
       // reemplazamos el con por coma
-      body.Message = body.Message.replace(/\scon\s/g, ".");
+      body.Message = body.Message.replace(conReplacementRegex, ".");
     }
 
     //logear el mensaje despues de los filtros
