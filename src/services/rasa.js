@@ -5,7 +5,7 @@ const { getUri } = require('../helpers/name-to-uri');
 /**
  * Gets the updated slots from the bot
  * @param {Object} argObject: botName {String} interactionId {String}
- * @returns {Array} slots {Array}
+ * @returns {Object} slots
  */
 async function getSlots({ botName, interactionId }) {
   const uri = `${getUri({ botName })}/conversations/${interactionId}/tracker`;
@@ -14,10 +14,10 @@ async function getSlots({ botName, interactionId }) {
     .child({ module: 'rasa getSlots', uri })
     .trace(`${interactionId} 🔎 Slots: ${JSON.stringify(response.data.slots)}`);
   const { slots } = response.data;
-  const slotsArray = Object.keys(slots).map(
-    (key) => `${key}=${slots[key]}`,
-  );
-  return slotsArray;
+  //   const slotsArray = Object.keys(slots).map(
+  //     (key) => `${key}=${slots[key]}`,
+  //   );
+  return slots;
 }
 
 /**
