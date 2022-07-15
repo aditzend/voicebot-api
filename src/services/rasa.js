@@ -3,6 +3,24 @@ const { logger } = require('../utils/logger');
 const { getUri } = require('../helpers/name-to-uri');
 
 /**
+ * Gets the updated slots from the bot
+ * @param {Object} argObject: botName {String} interactionId {String}
+ * @returns {Array} slots {Array}
+ */
+async function getSlots({ botName, interactionId }) {
+  const uri = `${getUri(botName)}/conversations/${interactionId}/tracker`;
+  const response = await axios.get(uri);
+  logger
+    .child({ module: 'rasa getSlots', uri })
+    .trace(`${interactionId} 🔎 Slots: ${JSON.stringify(response.data.slots)}`);
+  const { slots } = response.data;
+  const slotsArray = Object.keys(slots).map(
+    (key) => `${key}=${slots[key]}`,
+  );
+  return slotsArray;
+}
+
+/**
  * Push a message and then close the conversation
  * @param {Object} argObject: message {String}
  * @returns {Object} events {Array}
@@ -29,12 +47,13 @@ function showMessageThenTransfer({ message }) {
 /**
  *
  * @param {Object} argObject: body {Object} uri {String}
- * @returns {Object} events {Array}
+ * @returns {Object} events {Array} slots {Array}
  */
 // eslint-disable-next-line consistent-return
 async function postMessage({ uri, body }) {
-  let events = [];
   try {
+    let events = [];
+    let slotsNeeded = false;
     const sender = body.InteractionId;
 
     // uri includes http or https
@@ -66,13 +85,18 @@ async function postMessage({ uri, body }) {
       switch (command) {
         case 'show_message_then_close':
           events = showMessageThenClose({ message });
+          slotsNeeded = true;
           logger.debug(`${body.InteractionId} 🔪 closed`);
           break;
         case 'show_message_then_transfer':
           events = showMessageThenTransfer({ message });
+          slotsNeeded = true;
+
           logger.debug(`${body.InteractionId} 👋 transfered`);
           break;
         default:
+          slotsNeeded = false;
+
           events.push({
             name: '*text',
             message: event.text,
@@ -80,7 +104,13 @@ async function postMessage({ uri, body }) {
           break;
       }
     });
-    return events;
+    let slots = [];
+    if (slotsNeeded) {
+      slots = await getSlots({ botName: body.BotName, interactionId: body.InteractionId });
+    } else {
+      slots = ['wait for session end'];
+    }
+    return { events, slots };
   } catch (error) {
     logger
       .child({
@@ -163,23 +193,13 @@ async function loadFieldAsSlot({ name, value, uri }) {
 }
 
 /**
- * Sends Request Parameters as slots to the bot
- * @param {Object} argObject: body {Object}
- * @returns {Promise} Result of the request
- */
-async function sendParamsToBot({ body }) {
-  body.BotName = body.BotName || 'localhost';
-  body.InteractionId = body.InteractionId || 'test';
-  body.Parameters = body.Parameters || [];
-}
-
-/**
  * Sends a message to a bot and transforms the response
  * according to the bot's commands
  * @param {Object} body {Object}
  * @returns {Object} result
  */
 module.exports.sendRestMessageToBot = async function send({ body }) {
+  const result = body;
   if (body.BotName.length < 1) {
     logger
       .child({
@@ -194,9 +214,12 @@ module.exports.sendRestMessageToBot = async function send({ body }) {
     return result;
   }
   const uri = getUri({ botName: body.BotName });
-  const botEvents = await postMessage({ uri, body });
-  const result = body;
-  result.Events = botEvents;
+  const { events, slots } = await postMessage({ uri, body });
+  result.Events = events;
+  result.Parameters = slots;
+  logger
+    .child({ module: 'rasa sendRestMessageToBot', uri, body })
+    .trace(`${result.Parameters.length} parameters loaded`);
   return result;
 };
 
