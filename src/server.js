@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { cleanMessage } = require('./helpers/filters');
-const { sendRestMessageToBot } = require('./services/rasa');
+const { sendRestMessageToBot, loadInitialFieldsIntoSlots } = require('./services/rasa');
 const { logger } = require('./utils/logger');
 
 const app = express();
@@ -47,6 +47,7 @@ app.post('/bot', async (req, res) => {
       logger
         .child({ module: 'server app.post', body })
         .debug(`${body.InteractionId} 🔌  Client: *online`);
+      await loadInitialFieldsIntoSlots({ body });
       result = await sendRestMessageToBot({ body: result });
       res.json(result);
       break;

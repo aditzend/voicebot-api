@@ -2,23 +2,6 @@ const axios = require('axios');
 const { logger } = require('../utils/logger');
 const { getUri } = require('../helpers/name-to-uri');
 
-// /**
-//  *
-//  * @param {Object} argObject: response {Object} body {Object}
-//  */
-// const noBotName = ({ response, body }) => {
-//   logger
-//     .child({
-//       module: 'rasa noBotName',
-//     })
-//     .error('❌ No BotName. Message will not be dispatched.');
-//   body.Events.push({
-//     name: '*error',
-//     message: 'Error 1004 . No BotName received.',
-//   });
-//   response.json(body);
-// };
-
 /**
  * Push a message and then close the conversation
  * @param {Object} argObject: message {String}
@@ -108,6 +91,89 @@ async function postMessage({ uri, body }) {
 }
 
 /**
+ * Loads a slot on a bot
+ * @param {Object} uri {String} param {String}
+ * @returns {Object} BotResponse
+ */
+// eslint-disable-next-line consistent-return
+async function sendParam({ uri, param = '' }) {
+  // un ejemplo de param es "user_name=juan"
+  const name = param.split('=')[0];
+  const value = param.split('=')[1];
+
+  const options = {
+    method: 'POST',
+    uri,
+    body: {
+      event: 'slot',
+      name,
+      value,
+      timestamp: new Date().getTime(),
+    },
+    json: true,
+  };
+
+  try {
+    const botResponse = await requestPromise(options);
+    logger
+      .child({ module: 'helpers sendParam', ...options })
+      .debug(`Parameter ${param} inserted`);
+    return botResponse;
+  } catch (error) {
+    logger
+      .child({
+        module: 'helpers sendParam',
+      })
+      .error(error);
+  }
+}
+
+/**
+ * Loads a slot from a key-value pair
+ * @param {Object} argObject: name {String} value {String} uri {String}
+ * @returns {Promise} Result of the request
+ */
+// eslint-disable-next-line consistent-return
+async function loadFieldAsSlot({ name, value, uri }) {
+  try {
+    const response = await axios.post(
+      uri,
+      {
+        event: 'slot',
+        name,
+        value,
+        timestamp: new Date().getTime(),
+      },
+      {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    logger
+      .child({ module: 'rasa loadFieldAsSlot' })
+      .debug(`Field ${name} loaded as slot`);
+    return response;
+  } catch (error) {
+    logger
+      .child({
+        module: 'helpers sendParam',
+      })
+      .error(error);
+  }
+}
+
+/**
+ * Sends Request Parameters as slots to the bot
+ * @param {Object} argObject: body {Object}
+ * @returns {Promise} Result of the request
+ */
+async function sendParamsToBot({ body }) {
+  body.BotName = body.BotName || 'localhost';
+  body.InteractionId = body.InteractionId || 'test';
+  body.Parameters = body.Parameters || [];
+}
+
+/**
  * Sends a message to a bot and transforms the response
  * according to the bot's commands
  * @param {Object} body {Object}
@@ -131,5 +197,27 @@ module.exports.sendRestMessageToBot = async function send({ body }) {
   const botEvents = await postMessage({ uri, body });
   const result = body;
   result.Events = botEvents;
+  return result;
+};
+
+module.exports.loadInitialFieldsIntoSlots = async function loadSlots({ body }) {
+  const uri = `${getUri({ botName: body.BotName })}/conversations/${
+    body.InteractionId
+  }/tracker/events?include_events=NONE`;
+  const paramInserts = Object.entries(body).map(async ([key, value]) => {
+    let fixedKey = key;
+    if (key.includes('.')) {
+      logger
+        .child({ module: 'rasa loadInitialFieldsIntoSlots' })
+        .warn(` ⚠️ ${key} should not contain dots`);
+      fixedKey = key.replace('.', '_');
+      logger
+        .child({ module: 'rasa sendParloadInitialFieldsIntoSlotsamsToBot' })
+        .warn(`📝 ${key} is the new field name`);
+    }
+    const paramInsert = await loadFieldAsSlot({ name: fixedKey, value, uri });
+    return paramInsert;
+  });
+  const result = await Promise.all(paramInserts);
   return result;
 };
