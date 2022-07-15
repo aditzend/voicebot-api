@@ -2,7 +2,7 @@
 LOG_LEVEL="trace" \
 NODE_ENV="production" \
 BOT_ENV="development" \
-BOT_DEV_URL="http://10.30.0.20:42005" \
+BOT_DEV_URL="http://192.168.43.169:47805" \
 BLUEBIRD_W_FORGOTTEN_RETURN=0 \
 RABBITMQ_HOST="amqp://192.168.43.169:35672" \
 BOT_WAKE_UP_WORD="/start" \

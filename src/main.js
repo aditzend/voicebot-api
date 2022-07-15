@@ -3,17 +3,14 @@
  * main.js
  */
 
-VERSION = `1.0.2`
+const VERSION = '1.0.3';
 
-const {logger} = require("./logger")
-
-ONLINE_INTERACTIONS = [] // List of online interactions
+const { logger } = require('./utils/logger');
+require('./server');
 
 logger
   .child({
-    module: `main`,
+    module: 'main',
     VERSION,
   })
-  .info(`Voicebot API started`);
-
-require("./apiRest");
+  .info('Voicebot API started');

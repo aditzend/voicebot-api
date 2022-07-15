@@ -1,4 +1,9 @@
-const { addColors, createLogger, format, transports } = require("winston");
+const {
+  addColors,
+  createLogger,
+  format,
+  transports,
+} = require('winston');
 
 const logLevels = {
   fatal: 0,
@@ -9,18 +14,18 @@ const logLevels = {
   trace: 5,
 };
 
-var logger = {};
+let logger = {};
 
 const colors = {
-  fatal: "red",
-  error: "magenta",
-  warn: "yellow",
-  info: "green",
-  debug: "cyan",
-  trace: "blue",
+  fatal: 'red',
+  error: 'magenta',
+  warn: 'yellow',
+  info: 'green',
+  debug: 'cyan',
+  trace: 'blue',
 };
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== 'production') {
   // logs copados para desarrollar y hacer debug local
   logger = createLogger({
     levels: logLevels,
@@ -32,36 +37,30 @@ if (process.env.NODE_ENV !== "production") {
         format: format.combine(
           format.colorize(),
           format.prettyPrint(),
-          format.simple()
+          format.simple(),
         ),
       }),
     ],
   });
 
-  
-
   addColors(colors);
 } else {
 // TODO ver como transportar estos logs porque son los mismos que desarrollo
-logger = createLogger({
-  levels: logLevels,
-  transports: [
-    new transports.Console({
-      level: process.env.LOG_LEVEL,
+  logger = createLogger({
+    levels: logLevels,
+    transports: [
+      new transports.Console({
+        level: process.env.LOG_LEVEL,
 
-      format: format.combine(
-        format.colorize(),
-        format.prettyPrint(),
-        format.simple()
-      ),
-    }),
-  ],
-});
-addColors(colors);
-
-
-
-
+        format: format.combine(
+          format.colorize(),
+          format.prettyPrint(),
+          format.simple(),
+        ),
+      }),
+    ],
+  });
+  addColors(colors);
 
   // logger = createLogger({
   //   level: process.env.LOG_LEVEL,
