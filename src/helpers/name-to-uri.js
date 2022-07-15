@@ -5,7 +5,7 @@ const { logger } = require('../utils/logger');
  * @param {Object} argObject:  botName {String}
  * @returns {String} BotUri
  */
-function botNameToBotUri({ botName = 'bot' }) {
+function botNameToBotUri({ botName }) {
   const name = botName.toLowerCase();
   return process.env.BOT_ENV === 'development'
     ? process.env.BOT_DEV_URL
@@ -15,10 +15,16 @@ function botNameToBotUri({ botName = 'bot' }) {
 /**
  * Returns the uri of the bot
  * @param {Object} argObject:  botName {String}
- * @returns
+ * @returns {String} BotUri
  */
 // eslint-disable-next-line consistent-return
 module.exports.getUri = function getUri({ botName }) {
+  if (botName.length === 0) {
+    logger
+      .child({ module: 'name-to-uri getUri' })
+      .error('Bot name is empty');
+    return;
+  }
   let result = '';
   try {
     result = botNameToBotUri({ botName });

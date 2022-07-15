@@ -8,7 +8,7 @@ const { getUri } = require('../helpers/name-to-uri');
  * @returns {Array} slots {Array}
  */
 async function getSlots({ botName, interactionId }) {
-  const uri = `${getUri(botName)}/conversations/${interactionId}/tracker`;
+  const uri = `${getUri({ botName })}/conversations/${interactionId}/tracker`;
   const response = await axios.get(uri);
   logger
     .child({ module: 'rasa getSlots', uri })
@@ -108,7 +108,7 @@ async function postMessage({ uri, body }) {
     if (slotsNeeded) {
       slots = await getSlots({ botName: body.BotName, interactionId: body.InteractionId });
     } else {
-      slots = ['wait for session end'];
+      slots = ['Slots will be updated when the conversation is closed'];
     }
     return { events, slots };
   } catch (error) {
