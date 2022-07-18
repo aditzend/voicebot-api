@@ -18,6 +18,7 @@ app.post('/bot', async (req, res) => {
   const { body } = req;
   // Prepare the response in the `result` mutable object
   let result = body;
+  result.Events = [];
 
   // Apply filters
   if (body.message) {
@@ -60,7 +61,11 @@ app.post('/bot', async (req, res) => {
       break;
     }
     default: {
-      if (body.Message.length < 1) {
+      if (
+        !body
+        || !body.Message
+        || body?.Message?.length < 1
+      ) {
         logger
           .child({ module: 'server app.post', body })
           .error('❌ No Message. Message will not be dispatched.');
