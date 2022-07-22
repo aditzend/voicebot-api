@@ -7,14 +7,36 @@
     "origin": "https://alexander.ditzend@bitbucket.mitrol.net/scm/btf/gateway.git"
   },
   "scripts": {
+    "serve": "node dist/index.js",
+    "build": "babel src -d dist --source-maps",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/index.js"
   },
-  "author": "",
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": true
+          }
+        }
+      ]
+    ]
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "Alexander Ditzend",
   "license": "ISC",
   "dependencies": {
+    "@babel/cli": "^7.18.9",
+    "@babel/core": "^7.18.9",
+    "@babel/node": "^7.18.9",
+    "@babel/preset-env": "^7.18.9",
     "amqplib": "^0.8.0",
     "axios": "^0.27.2",
+    "babel": "^6.23.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",

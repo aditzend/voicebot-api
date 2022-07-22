@@ -68,11 +68,18 @@ app.post('/bot', async (req, res) => {
       ) {
         logger
           .child({ module: 'server app.post', body })
-          .error('❌ No Message. Message will not be dispatched.');
+          .error('❌ No body.Message found. Message will be dispatched as ">>>ERROR_2000<<<".');
+
+        result.Events.push({
+          name: '*text',
+          message: '>>>ERROR_2000<<<',
+        });
+        // TODO: Ver si esto afecta el funcionamiento del scribe
         result.Events.push({
           name: '*error',
           message: 'Error 2000 . Message empty.',
         });
+        result = await sendRestMessageToBot({ body: result });
         res.json(result);
         break;
       }

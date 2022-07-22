@@ -3,7 +3,7 @@
  * main.js
  */
 
-const VERSION = '1.0.3';
+const VERSION = '1.1.1';
 
 const { logger } = require('./utils/logger');
 require('./server');

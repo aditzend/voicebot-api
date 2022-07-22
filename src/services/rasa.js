@@ -121,44 +121,6 @@ async function postMessage({ uri, body }) {
 }
 
 /**
- * Loads a slot on a bot
- * @param {Object} uri {String} param {String}
- * @returns {Object} BotResponse
- */
-// eslint-disable-next-line consistent-return
-async function sendParam({ uri, param = '' }) {
-  // un ejemplo de param es "user_name=juan"
-  const name = param.split('=')[0];
-  const value = param.split('=')[1];
-
-  const options = {
-    method: 'POST',
-    uri,
-    body: {
-      event: 'slot',
-      name,
-      value,
-      timestamp: new Date().getTime(),
-    },
-    json: true,
-  };
-
-  try {
-    const botResponse = await requestPromise(options);
-    logger
-      .child({ module: 'helpers sendParam', ...options })
-      .debug(`Parameter ${param} inserted`);
-    return botResponse;
-  } catch (error) {
-    logger
-      .child({
-        module: 'helpers sendParam',
-      })
-      .error(error);
-  }
-}
-
-/**
  * Loads a slot from a key-value pair
  * @param {Object} argObject: name {String} value {String} uri {String}
  * @returns {Promise} Result of the request
