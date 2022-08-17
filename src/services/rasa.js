@@ -185,7 +185,7 @@ async function sendRestMessageToBot({ body }) {
   const uri = getUri({ botName: body.BotName });
   const { events, slots } = await postMessage({ uri, body });
   const mainEvents = events.map(async (firstOrderEvent) => {
-    logger.fatal(`msg: ${firstOrderEvent.message} name: ${firstOrderEvent.name}`);
+    logger.trace(`msg: ${firstOrderEvent.message} name: ${firstOrderEvent.name}`);
     if (firstOrderEvent.name === '*echo') {
       // Send the echo message to the bot
       const firstEchoResponse = await postMessage(
@@ -193,18 +193,31 @@ async function sendRestMessageToBot({ body }) {
       );
       const secondOrderEvents = firstEchoResponse.events.map(async (secondOrderEvent) => {
         if (secondOrderEvent.name === '*echo') {
-          logger.fatal(`msg: ${secondOrderEvent.message} name: ${secondOrderEvent.name}`);
+          logger.trace(`msg: ${secondOrderEvent.message} name: ${secondOrderEvent.name}`);
           // Send the second echo message to the bot
           const secondOrderEchoResponse = await postMessage({
             uri, body: { ...body, Message: secondOrderEvent.message },
           });
           const thirdOrderEvents = secondOrderEchoResponse.events.map(async (thirdOrderEvent) => {
             if (thirdOrderEvent.name === '*echo') {
-              logger.fatal(`msg: ${thirdOrderEvent.message} name: ${thirdOrderEvent.name}`);
+              logger.trace(`msg: ${thirdOrderEvent.message} name: ${thirdOrderEvent.name}`);
               const thirdOrderEchoResponse = await postMessage({
                 uri, body: { ...body, Message: thirdOrderEvent.message },
               });
-              return thirdOrderEchoResponse.events;
+              const fourthOrderEvents = thirdOrderEchoResponse
+                .events.map(async (fourthOrderEvent) => {
+                  if (fourthOrderEvent.name === '*echo') {
+                    logger.trace(`msg: ${fourthOrderEvent.message} name: ${fourthOrderEvent.name}`);
+                    const fourthOrderEchoResponse = await postMessage({
+                      uri, body: { ...body, Message: fourthOrderEvent.message },
+                    });
+                    const fifthOrderEvents = fourthOrderEchoResponse
+                      .events.map(async (fifthOrderEvent) => fifthOrderEvent);
+                    return Promise.all(fifthOrderEvents);
+                  }
+                  return fourthOrderEvent;
+                });
+              return Promise.all(fourthOrderEvents);
             }
             return thirdOrderEvent;
           });
@@ -229,7 +242,7 @@ async function sendRestMessageToBot({ body }) {
   // });
   logger.child({ ...mainEvents }).debug('Rasa response filtered');
   const allEvents = await Promise.all(mainEvents);
-  result.Events = _.flatten(_.flatten(_.flatten(allEvents)));
+  result.Events = _.flatten(_.flatten(_.flatten(_.flatten(allEvents))));
   result.Parameters = slots;
   logger
     .child({ module: 'rasa sendRestMessageToBot', uri, body })
