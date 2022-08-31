@@ -43,6 +43,7 @@
     "express": "^4.17.1",
     "lodash": "^4.17.21",
     "moment": "^2.24.0",
+    "rascal": "^15.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "winston": "^3.3.3",

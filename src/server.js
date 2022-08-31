@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const requestPromise = require('request-promise');
 const { cleanMessage } = require('./helpers/filters');
 const {
   sendRestMessageToBot,
@@ -9,6 +8,8 @@ const {
   getDomain,
 } = require('./services/rasa');
 const { logger } = require('./utils/logger');
+
+const { publishTaskToRabbitMQ } = require('./services/rabbit');
 
 const app = express();
 const port = process.env.API_PORT || 8656;
@@ -60,6 +61,21 @@ app.post('/bot', async (req, res) => {
 
   switch (body.EventName) {
     case '*online': {
+      let etlProcessor = 'DUAL';
+      try {
+        etlProcessor = body.Parameters.find(
+          (param) => param.split('=')[0] === 'etlProcessor',
+        ).split('=')[1];
+      } catch (error) {
+        logger
+          .child({ module: 'server.online', parameters: body.Parameters, error })
+          .debug('No etlProcessor specified.');
+      }
+      publishTaskToRabbitMQ({
+        botName: body.BotName.toLowerCase(),
+        interactionId: body.InteractionId,
+        processingOptions: { etlProcessor },
+      });
       result.Message = process.env.BOT_WAKE_UP_WORD || '/get_started';
       logger
         .child({ module: 'server app.post', body })
