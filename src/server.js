@@ -7,6 +7,7 @@ const {
   sendRestMessageToBot,
   loadInitialFieldsIntoSlots,
   getDomain,
+  getSlots,
 } = require('./services/rasa');
 const { logger } = require('./utils/logger');
 
@@ -107,7 +108,7 @@ app.post('/bot', async (req, res) => {
         logger
           .child({ module: 'server /bot', result })
           .debug(`${result.InteractionId} ⬅️ Responded to API Caller`
-          + `with: "${result.Events.forEach((e) => e.message)}"`);
+            + `with: "${result.Events.forEach((e) => e.message)}"`);
         res.json(result);
         break;
       }
@@ -115,10 +116,14 @@ app.post('/bot', async (req, res) => {
         .child({ module: 'server', body })
         .debug(`${body.InteractionId}  🗣 Incoming: *text '${body.Message}'`);
       result = await sendRestMessageToBot({ body: result });
+      result.Parameters = await getSlots(
+        { botName: body.BotName, interactionId: body.InteractionId },
+      );
       logger
         .child({ module: 'server /bot', result })
         .debug(`${result.InteractionId} ⬅️ Responded to API Caller`
           + ` with: "${result.Events}"`);
+
       res.json(result);
       break;
     }

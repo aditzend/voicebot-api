@@ -6,6 +6,10 @@
 const requestPromise = require('request-promise');
 const { logger } = require('./utils/logger');
 
+const correctBigNumber = function (argObject) {
+  const { message } = argObject;
+};
+
 /**
  * TODO: Refactor this function
  * @param {Object} argObject: body {Object}

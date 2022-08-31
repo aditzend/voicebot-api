@@ -25,7 +25,7 @@ async function eventMapper({ uri, body, events }) {
  * @param {Object} argObject: botName {String} interactionId {String}
  * @returns {Object} slots
  */
-async function getSlots({ botName, interactionId }) {
+module.exports.getSlots = async function getSlots({ botName, interactionId }) {
   const uri = `${getUri({ botName })}/conversations/${interactionId}/tracker`;
   const response = await axios.get(uri);
   logger
@@ -36,7 +36,7 @@ async function getSlots({ botName, interactionId }) {
   //     (key) => `${key}=${slots[key]}`,
   //   );
   return slots;
-}
+};
 
 /**
  *
@@ -111,11 +111,11 @@ async function postMessage({ uri, body }) {
           break;
       }
     });
-    let slots = [];
-    if (slotsNeeded) {
-      slots = await getSlots({ botName: body.BotName, interactionId: body.InteractionId });
-    }
-    return { events, slots };
+    const slots = [];
+    // if (slotsNeeded) {
+    //   slots = await getSlots({ botName: body.BotName, interactionId: body.InteractionId });
+    // }
+    return { events, slots, slotsNeeded };
   } catch (error) {
     logger
       .child({
@@ -148,7 +148,7 @@ async function sendRestMessageToBotRecursive({ body }) {
       return result;
     }
     const uri = getUri({ botName: body.BotName });
-    const { events, slots } = await postMessage({ uri, body });
+    const { events, slotsNeeded } = await postMessage({ uri, body });
     const mainEvents = await eventMapper({ uri, body: result, events });
     // logger.child({ ...mainEvents }).debug('Rasa response filtered');
     // const allEvents = await Promise.all(mainEvents);
@@ -156,7 +156,8 @@ async function sendRestMessageToBotRecursive({ body }) {
       .child({ module: 'rasa sendRestMessageToBot', mainEvents })
       .debug('All events recursively filtered');
     result.Events = mainEvents;
-    result.Parameters = slots;
+    // result.Parameters = slots;
+    result.ParamsNeeded = slotsNeeded;
     // logger
     //   .child({ module: 'rasa sendRestMessageToBot', uri, body })
     //   .trace(`${result.Parameters.length} parameters loaded`);
@@ -183,7 +184,7 @@ async function sendRestMessageToBot({ body }) {
     return result;
   }
   const uri = getUri({ botName: body.BotName });
-  const { events, slots } = await postMessage({ uri, body });
+  const { events, slots, slotsNeeded } = await postMessage({ uri, body });
   const mainEvents = events.map(async (firstOrderEvent) => {
     logger.trace(`msg: ${firstOrderEvent.message} name: ${firstOrderEvent.name}`);
     if (firstOrderEvent.name === '*echo') {
@@ -230,16 +231,6 @@ async function sendRestMessageToBot({ body }) {
     return firstOrderEvent;
   });
 
-  // await events.forEach(async (event) => {
-  //   logger.fatal(`msg: ${event.message} name: ${event.name}`);
-  //   if (event.name === '*echo') {
-  //     const echoResponse = await postMessage({ uri, body: { ...body, Message: event.message } });
-  //     added.push({
-  //       name: echoResponse.events[0].name,
-  //       message: echoResponse.events[0].message,
-  //     });
-  //   }
-  // });
   logger.child({ ...mainEvents }).debug('Rasa response filtered');
   const allEvents = await Promise.all(mainEvents);
   result.Events = _.flatten(_.flatten(_.flatten(_.flatten(allEvents))));
