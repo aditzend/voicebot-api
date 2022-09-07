@@ -184,7 +184,7 @@ async function sendRestMessageToBot({ body }) {
     return result;
   }
   const uri = getUri({ botName: body.BotName });
-  const { events, slots, slotsNeeded } = await postMessage({ uri, body });
+  const { events, slots } = await postMessage({ uri, body });
   const mainEvents = events.map(async (firstOrderEvent) => {
     logger.trace(`msg: ${firstOrderEvent.message} name: ${firstOrderEvent.name}`);
     if (firstOrderEvent.name === '*echo') {
