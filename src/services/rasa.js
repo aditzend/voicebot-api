@@ -111,11 +111,12 @@ async function postMessage({ uri, body }) {
           break;
       }
     });
-    const slots = [];
-    // if (slotsNeeded) {
-    //   slots = await getSlots({ botName: body.BotName, interactionId: body.InteractionId });
-    // }
-    return { events, slots, slotsNeeded };
+    let slots = [];
+    if (slotsNeeded) {
+      slots = await getSlots({ botName: body.BotName, interactionId: body.InteractionId });
+    }
+    return { events, slots };
+    // return { events, slots, slotsNeeded };
   } catch (error) {
     logger
       .child({
