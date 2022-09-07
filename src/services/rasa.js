@@ -25,7 +25,7 @@ async function eventMapper({ uri, body, events }) {
  * @param {Object} argObject: botName {String} interactionId {String}
  * @returns {Object} slots
  */
-module.exports.getSlots = async function getSlots({ botName, interactionId }) {
+async function getSlots({ botName, interactionId }) {
   const uri = `${getUri({ botName })}/conversations/${interactionId}/tracker`;
   const response = await axios.get(uri);
   logger
@@ -36,7 +36,8 @@ module.exports.getSlots = async function getSlots({ botName, interactionId }) {
   //     (key) => `${key}=${slots[key]}`,
   //   );
   return slots;
-};
+}
+module.exports.getSlots = getSlots;
 
 /**
  *
