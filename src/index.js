@@ -3,14 +3,14 @@
  * main.js
  */
 
-const VERSION = '1.5.0';
+const VERSION = "1.6.0";
 
-const { logger } = require('./utils/logger');
-require('./server');
+const { logger } = require("./utils/logger");
+require("./server");
 
 logger
   .child({
-    module: 'main',
+    module: "main",
     VERSION,
   })
-  .info('Voicebot API started');
+  .info("Voicebot API started");
