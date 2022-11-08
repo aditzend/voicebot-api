@@ -42,65 +42,62 @@ module.exports.cleanMessage = function voiceBotCleaner({ message = "" }) {
     cleanedMessage = cleanedMessage.replace(conReplacementRegex, ".");
   }
 
-  if (process.env.NUMBER_CONDENSING_ENABLED === 1) {
-    const asrBugRegex = /\d\s\d/;
-    const numberOrSpaceRegex = /\d|\s/;
-    const spaceRegex = /\s/;
-    const notNumberRegex = /\D/;
-    const match = asrBugRegex.exec(cleanedMessage);
-    if (match) {
-      logger.trace(
-        `match found at ${match.index} char:${cleanedMessage[match.index]}`
-      );
-      let firstCursor = match.index;
-      while (numberOrSpaceRegex.exec(cleanedMessage[firstCursor])) {
-        firstCursor -= 1;
-      }
-      logger.trace(
-        `First cursor stopped at ${firstCursor}, char : ${cleanedMessage[firstCursor]}`
-      );
-      let secondCursor = firstCursor + 1;
-      while (spaceRegex.exec(cleanedMessage[secondCursor])) {
-        secondCursor += 1;
-      }
-      logger.trace(
-        `Second cursor stopped at ${secondCursor}, char : ${cleanedMessage[secondCursor]}`
-      );
-
-      let thirdCursor = secondCursor;
-
-      while (numberOrSpaceRegex.exec(cleanedMessage[thirdCursor])) {
-        thirdCursor += 1;
-      }
-      logger.trace(
-        `Third cursor stopped at ${thirdCursor}, char : ${cleanedMessage[thirdCursor]}`
-      );
-
-      let fourthCursor =
-        cleanedMessage[thirdCursor] === undefined
-          ? thirdCursor - 1
-          : thirdCursor;
-      while (notNumberRegex.exec(cleanedMessage[fourthCursor])) {
-        fourthCursor -= 1;
-      }
-      logger.trace(
-        `Fourth cursor stopped at ${fourthCursor}, char : ${cleanedMessage[fourthCursor]}`
-      );
-
-      const toBeCondensed = cleanedMessage.substring(
-        secondCursor,
-        fourthCursor + 1
-      );
-      const condensed = toBeCondensed.replace(/\s/g, "");
-      logger.trace(`Condensed ${toBeCondensed} to ${condensed}`);
-
-      const beforeString = cleanedMessage.substring(0, secondCursor);
-      const afterString = cleanedMessage.substring(fourthCursor + 1);
-
-      cleanedMessage = beforeString + condensed + afterString;
-
-      logger.trace(`Final message: ${cleanedMessage}`);
+  // if (process.env.NUMBER_CONDENSING_ENABLED === 1) {
+  const asrBugRegex = /\d\s\d/;
+  const numberOrSpaceRegex = /\d|\s/;
+  const spaceRegex = /\s/;
+  const notNumberRegex = /\D/;
+  const match = asrBugRegex.exec(cleanedMessage);
+  if (match) {
+    logger.trace(
+      `match found at ${match.index} char:${cleanedMessage[match.index]}`
+    );
+    let firstCursor = match.index;
+    while (numberOrSpaceRegex.exec(cleanedMessage[firstCursor])) {
+      firstCursor -= 1;
     }
+    logger.trace(
+      `First cursor stopped at ${firstCursor}, char : ${cleanedMessage[firstCursor]}`
+    );
+    let secondCursor = firstCursor + 1;
+    while (spaceRegex.exec(cleanedMessage[secondCursor])) {
+      secondCursor += 1;
+    }
+    logger.trace(
+      `Second cursor stopped at ${secondCursor}, char : ${cleanedMessage[secondCursor]}`
+    );
+
+    let thirdCursor = secondCursor;
+
+    while (numberOrSpaceRegex.exec(cleanedMessage[thirdCursor])) {
+      thirdCursor += 1;
+    }
+    logger.trace(
+      `Third cursor stopped at ${thirdCursor}, char : ${cleanedMessage[thirdCursor]}`
+    );
+
+    let fourthCursor =
+      cleanedMessage[thirdCursor] === undefined ? thirdCursor - 1 : thirdCursor;
+    while (notNumberRegex.exec(cleanedMessage[fourthCursor])) {
+      fourthCursor -= 1;
+    }
+    logger.trace(
+      `Fourth cursor stopped at ${fourthCursor}, char : ${cleanedMessage[fourthCursor]}`
+    );
+
+    const toBeCondensed = cleanedMessage.substring(
+      secondCursor,
+      fourthCursor + 1
+    );
+    const condensed = toBeCondensed.replace(/\s/g, "");
+    logger.trace(`Condensed ${toBeCondensed} to ${condensed}`);
+
+    const beforeString = cleanedMessage.substring(0, secondCursor);
+    const afterString = cleanedMessage.substring(fourthCursor + 1);
+
+    cleanedMessage = beforeString + condensed + afterString;
+
+    logger.trace(`Final message: ${cleanedMessage}`);
   }
 
   logger
