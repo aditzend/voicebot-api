@@ -8,6 +8,7 @@ const {
   loadInitialFieldsIntoSlots,
   getDomain,
   getSlots,
+  getPtsSlots,
 } = require('./services/rasa');
 const { logger } = require('./utils/logger');
 
@@ -78,6 +79,11 @@ app.post('/bot', async (req, res) => {
       logger
         .child({ module: 'server app.post', body })
         .debug(`${body.InteractionId} ➡️  API Caller offline`);
+      const ptsSlots = await getPtsSlots({
+        botName: body.BotName,
+        interactionId: body.InteractionId,
+      });
+      logger.fatal({ ptsSlots });
       // Nothing to respond to *offline
       break;
     }

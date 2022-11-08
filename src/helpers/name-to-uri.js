@@ -7,9 +7,10 @@ const { logger } = require('../utils/logger');
  */
 function botNameToBotUri({ botName }) {
   const name = botName.toLowerCase();
-  return process.env.BOT_ENV === 'development'
+  const uri = process.env.BOT_ENV === 'development'
     ? process.env.BOT_DEV_URL
-    : `http://${name}_${process.env.PRODUCTION_RASA_SERVICE_NAME || 'bm'}:5005`;
+    : `http://${name}_${process.env.PRODUCTION_RASA_SERVICE_NAME}:5005`;
+  return uri;
 }
 
 /**
@@ -18,20 +19,18 @@ function botNameToBotUri({ botName }) {
  * @returns {String} BotUri
  */
 // eslint-disable-next-line consistent-return
-module.exports.getUri = function getUri({ botName }) {
+module.exports.getUri = function getBotUri({ botName }) {
   if (botName.length === 0) {
     logger
       .child({ module: 'name-to-uri getUri' })
       .error('Bot name is empty');
-    return;
-  }
-  let result = '';
-  try {
-    result = botNameToBotUri({ botName });
-    return result;
-  } catch (error) {
-    logger
-      .child({ module: 'helpers getUri' })
-      .error(error);
+  } else {
+    try {
+      return botNameToBotUri({ botName });
+    } catch (error) {
+      logger
+        .child({ module: 'helpers getUri' })
+        .error(error);
+    }
   }
 };

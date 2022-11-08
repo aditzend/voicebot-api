@@ -40,6 +40,20 @@ async function getSlots({ botName, interactionId }) {
 module.exports.getSlots = getSlots;
 
 /**
+ * Gets the slots starting with the prefix 'pts_' only
+ * @param {Object} argObject: botName {String} interactionId {String}
+ * @returns {Object} slots
+ */
+async function getPtsSlots({ botName, interactionId }) {
+  const uri = `${getUri({ botName })}/conversations/${interactionId}/tracker`;
+  const response = await axios.get(uri);
+  const { slots } = response.data;
+  const ptsSlots = slots.filter((slot) => slot.startsWith('pts_'));
+  return ptsSlots;
+}
+module.exports.getPtsSlots = getPtsSlots;
+
+/**
  *
  * @param {Object} argObject: body {Object} uri {String}
  * @returns {Object} events {Array} slots {Array}
